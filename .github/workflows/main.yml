@@ -15,36 +15,31 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Theos
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
-          echo "THEOS=~/theos" >> $GITHUB_ENV
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
 
       - name: Build with Theos
         run: |
           MAKEFILE_PATH=$(find . -iname "makefile" | head -n 1)
           
           if [ -z "$MAKEFILE_PATH" ]; then
-            echo "Error: Makefile එක හොයාගන්න නෑ!"
+            echo "Error: Makefile එක සොයා ගැනීමට නොහැකි විය!"
             exit 1
           fi
           
           cd "$(dirname "$MAKEFILE_PATH")"
           
-          echo "--- Compiler Warnings මඟහැරීම ---"
-          echo "ADDITIONAL_CFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
-          echo "ADDITIONAL_CCFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
-          echo "-----------------------------------"
+          # Clean old builds and compile
+          make clean
+          make package FINALPACKAGE=1
           
-          make FINALPACKAGE=1
-          
-          echo "--- Dylib ෆයිල් එක එළියට ගැනීම ---"
+          echo "--- Dylib ෆයිල් එක වෙනම ලබා ගැනීම ---"
           mkdir -p Final_Output
-          find . -name "*.dylib" -exec cp {} ./Final_Output/ \;
+          find .theos/obj -name "*.dylib" -exec cp {} ./Final_Output/ \;
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ModMenu-Dylib
-          path: "**/Final_Output/*.dylib"
+          path: Final_Output/*.dylib
