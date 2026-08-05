@@ -1,4 +1,4 @@
-name: Build 34306jit Mod Menu
+name: Build Project
 
 on:
   push:
@@ -12,34 +12,24 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
         with:
-          submodules: recursive
+          xcode-version: latest-stable
 
-      - name: Setup Theos Environment
+      - name: Build with xcodebuild
         run: |
-          echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
-          git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
+          xcodebuild clean build \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
 
-      - name: Setup iOS SDKs
-        run: |
-          rm -rf $GITHUB_WORKSPACE/theos/sdks
-          git clone --depth=1 https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
-
-      - name: Build Tweak Package
-        run: |
-          make clean
-          make package FINALPACKAGE=1
-
-      - name: Upload Built Deb Package
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: 34306jit-deb
-          path: packages/*.deb
-
-      - name: Upload Dylib Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: 34306jit-dylib
-          path: .theos/obj/debug/*.dylib
+          name: compiled-build
+          path: build/
