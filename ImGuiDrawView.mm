@@ -338,7 +338,7 @@ ImFont* Urbanist;
                         
                         ImGui::Separator();
                         ImGui::TextColored(ImVec4(0.28f, 0.56f, 1.00f, 1.00f), oxorany("Developer Info:"));
-                        ImGui::Text(oxorany("Telegram: @THEBRAZILI"));
+                        ImGui::Text(oxorany("OWNER: @ChamikaDinith"));
                         
                         ImGui::EndTabItem();
                     }
