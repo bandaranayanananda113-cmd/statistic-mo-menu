@@ -1,4 +1,4 @@
-Name: Build iOS Mod Menu
+name: Build iOS Mod Menu
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build Tweak
-    runs-on: macos-13 # macos-latest වලදී ගොඩක් වෙලාවට Xcode/Toolchain වෙනස්කම් නිසා macos-13 වඩාත් ස්ථාවරයි
+    runs-on: macos-13
 
     steps:
       - name: Checkout Repository
@@ -28,22 +28,18 @@ jobs:
           MAKEFILE_PATH=$(find . -iname "makefile" | head -n 1)
           
           if [ -z "$MAKEFILE_PATH" ]; then
-            echo "Error: Makefile එක හොයාගන්න නෑ!"
+            echo "Error: Makefile not found!"
             exit 1
           fi
           
           cd "$(dirname "$MAKEFILE_PATH")"
           
-          echo "--- Compiler Warnings මඟහැරීම ---"
-          # \n එකක් යෙදීමෙන් Makefile එකේ අගට නිවැරදිව නව පේළියකින් එකතු වේ
           echo -e "\nADDITIONAL_CFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
           echo -e "ADDITIONAL_CCFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c\n" >> Makefile
-          echo "-----------------------------------"
           
           make clean
           make FINALPACKAGE=1
           
-          echo "--- Dylib ෆයිල් එක එළියට ගැනීම ---"
           mkdir -p Final_Output
           find .obj -name "*.dylib" -exec cp {} ./Final_Output/ \; || find . -name "*.dylib" -exec cp {} ./Final_Output/ \;
 
