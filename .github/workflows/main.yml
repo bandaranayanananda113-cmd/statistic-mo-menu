@@ -1,14 +1,15 @@
-name: Build iOS Mod Menu
+name: Build 34306jit Mod Menu
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build Tweak
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Repository
@@ -16,41 +17,28 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Theos
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Theos Environment
         run: |
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
-          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
+          git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
 
-      - name: Build with Theos
+      - name: Download iOS SDKs
         run: |
-          # 1. Makefile එක පිහිටා ඇති ස්ථානය සෙවීම
-          MAKEFILE_PATH=$(find . -iname "Makefile" | head -n 1)
-          
-          if [ -z "$MAKEFILE_PATH" ]; then
-            echo "Error: Makefile එක සොයා ගැනීමට නොහැකි විය!"
-            exit 1
-          fi
-          
-          CD_DIR=$(dirname "$MAKEFILE_PATH")
-          cd "$CD_DIR"
-          
-          # 2. Makefile එකට අවශ්‍ය Warning Flags ආරක්ෂිතව එකතු කිරීම
-          echo "" >> Makefile
-          echo "ADDITIONAL_CFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
-          echo "ADDITIONAL_CCFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
-          
-          # 3. Compile කිරීම
+          git clone --depth=1 https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
+
+      - name: Build Tweak Package
+        run: |
           make clean
-          make FINALPACKAGE=1
-          
-          # 4. නිර්මාණය වූ .dylib ෆයිල් එක සොයා වෙනම Folder එකකට දැමීම
-          mkdir -p Final_Output
-          find . -name "*.dylib" -exec cp {} ./Final_Output/ \;
+          make package FINALPACKAGE=1
+
+      - name: Upload Built Deb Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: 34306jit-deb
+          path: packages/*.deb
 
       - name: Upload Dylib Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ModMenu-Dylib
-          path: "**/Final_Output/*.dylib"
+          name: 34306jit-dylib
+          path: .theos/obj/debug/*.dylib
