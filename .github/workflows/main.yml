@@ -1,50 +1,38 @@
-name: Build iOS Mod Menu
+name: Build Theos Tweak
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build Tweak
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Setup Theos
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Dependencies
         run: |
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
-          echo "THEOS=~/theos" >> $GITHUB_ENV
+          brew install lz4 xz
 
-      - name: Build with Theos
+      - name: Set up Theos
         run: |
-          MAKEFILE_PATH=$(find . -iname "makefile" | head -n 1)
-          
-          if [ -z "$MAKEFILE_PATH" ]; then
-            echo "Error: Makefile එක හොයාගන්න නෑ!"
-            exit 1
-          fi
-          
-          cd "$(dirname "$MAKEFILE_PATH")"
-          
-          echo "--- Compiler Warnings මඟහැරීම ---"
-          echo "ADDITIONAL_CFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
-          echo "ADDITIONAL_CCFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
-          echo "-----------------------------------"
-          
-          make FINALPACKAGE=1
-          
-          echo "--- Dylib ෆයිල් එක එළියට ගැනීම ---"
-          mkdir -p Final_Output
-          find . -name "*.dylib" -exec cp {} ./Final_Output/ \;
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
 
-      - name: Upload Artifact
+      - name: Build Package
+        run: |
+          make clean
+          make package FINALPACKAGE=1
+
+      - name: Upload Package Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ModMenu-Dylib
-          path: "**/Final_Output/*.dylib"
+          name: tweak-deb
+          path: packages/*.deb
