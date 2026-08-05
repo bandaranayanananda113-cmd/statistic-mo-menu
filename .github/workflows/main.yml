@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build Tweak
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Checkout Repository
@@ -25,25 +25,31 @@ jobs:
 
       - name: Build with Theos
         run: |
-          MAKEFILE_PATH=$(find . -iname "makefile" | head -n 1)
+          # 1. Makefile එක පිහිටා ඇති ස්ථානය සෙවීම
+          MAKEFILE_PATH=$(find . -iname "Makefile" | head -n 1)
           
           if [ -z "$MAKEFILE_PATH" ]; then
-            echo "Error: Makefile not found!"
+            echo "Error: Makefile එක සොයා ගැනීමට නොහැකි විය!"
             exit 1
           fi
           
-          cd "$(dirname "$MAKEFILE_PATH")"
+          CD_DIR=$(dirname "$MAKEFILE_PATH")
+          cd "$CD_DIR"
           
-          echo -e "\nADDITIONAL_CFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
-          echo -e "ADDITIONAL_CCFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c\n" >> Makefile
+          # 2. Makefile එකට අවශ්‍ය Warning Flags ආරක්ෂිතව එකතු කිරීම
+          echo "" >> Makefile
+          echo "ADDITIONAL_CFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
+          echo "ADDITIONAL_CCFLAGS += -Wno-error -Wno-nontrivial-memcall -Wno-module-import-in-extern-c" >> Makefile
           
+          # 3. Compile කිරීම
           make clean
           make FINALPACKAGE=1
           
+          # 4. නිර්මාණය වූ .dylib ෆයිල් එක සොයා වෙනම Folder එකකට දැමීම
           mkdir -p Final_Output
-          find .obj -name "*.dylib" -exec cp {} ./Final_Output/ \; || find . -name "*.dylib" -exec cp {} ./Final_Output/ \;
+          find . -name "*.dylib" -exec cp {} ./Final_Output/ \;
 
-      - name: Upload Artifact
+      - name: Upload Dylib Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ModMenu-Dylib
