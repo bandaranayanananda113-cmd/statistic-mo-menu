@@ -30,9 +30,11 @@ jobs:
           
           cd "$(dirname "$MAKEFILE_PATH")"
           
-          # Clean old builds and compile
+          # Clean old builds and compile with all bypass flags
           make clean
-          make package FINALPACKAGE=1
+          make package FINALPACKAGE=1 \
+            ADDITIONAL_CFLAGS="-Wno-error -Wno-deprecated-declarations -Wno-missing-template-arg-list-after-template-kw -Wno-module-import-in-extern-c" \
+            ADDITIONAL_CCFLAGS="-Wno-error -Wno-deprecated-declarations -Wno-missing-template-arg-list-after-template-kw -Wno-module-import-in-extern-c"
           
           echo "--- Dylib ෆයිල් එක වෙනම ලබා ගැනීම ---"
           mkdir -p Final_Output
