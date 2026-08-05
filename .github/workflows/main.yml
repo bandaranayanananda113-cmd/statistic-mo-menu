@@ -22,8 +22,9 @@ jobs:
           echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
           git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
 
-      - name: Download iOS SDKs
+      - name: Setup iOS SDKs
         run: |
+          rm -rf $GITHUB_WORKSPACE/theos/sdks
           git clone --depth=1 https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
 
       - name: Build Tweak Package
