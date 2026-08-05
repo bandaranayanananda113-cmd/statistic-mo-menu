@@ -10,8 +10,9 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = 34306jit
 
-$(TWEAK_NAME)_CCFLAGS = -std=c++17 -fno-rtti -DNDEBUG -Wall -Wno-unused-variable -Wno-unused-function -Wno-unused-value -fvisibility=hidden
-$(TWEAK_NAME)_CFLAGS = -fobjc-arc -Wall -Wno-unused-variable -Wno-unused-function -Wno-unused-value -fvisibility=hidden
+# Compiler flags - Deprecated errors සහ අන්තරායකාරී නොවන warnings Ignore කිරීමට:
+$(TWEAK_NAME)_CCFLAGS = -std=c++17 -fno-rtti -DNDEBUG -Wall -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-deprecated-declarations -Wno-module-import-in-extern-c -Wno-missing-template-arg-list-after-template-kw -Wno-error -fvisibility=hidden
+$(TWEAK_NAME)_CFLAGS = -fobjc-arc -Wall -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-deprecated-declarations -Wno-module-import-in-extern-c -Wno-missing-template-arg-list-after-template-kw -Wno-error -fvisibility=hidden
 
 $(TWEAK_NAME)_FRAMEWORKS = UIKit Foundation Security QuartzCore CoreGraphics CoreText AVFoundation Accelerate GLKit SystemConfiguration GameController
 
