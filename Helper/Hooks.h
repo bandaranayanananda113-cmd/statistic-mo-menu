@@ -24,7 +24,7 @@ struct Vars_t
     bool isAimFov = {};
     int AimHitbox = 0; 
     const char* aimHitboxes[3] = {"Head", "Neck", "Body"};
-    const char *dir[4] = {"None", "Fire", "Scope", "Bắn và Ngắm"};
+    const char *dir[4] = {"None", "Fire", "Scope", "Fire + Scope"};
     const char *aimModes[3] = {"Aim 360°", "Aim 180°", "AimFov"};
     bool VisibleCheck = true;
     bool lines = {};
@@ -107,31 +107,21 @@ game_sdk_t *game_sdk = new game_sdk_t();
 void game_sdk_t::init()
 {
     this->GetHp = (int (*)(void *))getRealOffset(oxo("0x543592C"));
-    this->Curent_Match = (void *(*)())getRealOffset(oxo("0x55C2C7C"));
-    this->GetLocalPlayer = (void *(*)(void *))getRealOffset(oxo("0x55C2C7C"));
+    this->Curent_Match = (void *(*)())getRealOffset(oxo("0x55C4DA4"));
+    this->GetLocalPlayer = (void *(*)(void *))getRealOffset(oxo("0x2FFE494"));
     this->GetHeadPositions = (void *(*)(void *))getRealOffset(oxo("0x54547E0"));
     this->get_position = (Vector3(*)(void *))getRealOffset(oxo("0x91CA56C"));
-    this->Component_GetTransform = (void *(*)(void *))getRealOffset(oxo("0x91B8240"));
+    this->Component_GetTransform = (void *(*)(void *))getRealOffset(oxo("0x91B82E4"));
     this->get_camera = (void *(*)())getRealOffset(oxo("0x915E9E4"));
-
-    this->WorldToViewpoint = (Vector3(*)(void*, Vector3, int))getRealOffset(oxo("0x915DFF0"));
-
+    this->WorldToViewpoint = (Vector3(*)(void*, Vector3, int))getRealOffset(oxo("0x915E364"));
     this->get_isVisible = (bool (*)(void *))getRealOffset(oxo("0x53C8894"));
-
-    this->get_isLocalTeam = (bool (*)(void *))getRealOffset(oxo("0x55C5AC0"));
-
+    this->get_isLocalTeam = (bool (*)(void *))getRealOffset(oxo("0x53E20C4"));
     this->get_IsDieing = (bool (*)(void *))getRealOffset(oxo("0x53AA18C"));
-
     this->get_MaxHP = (int (*)(void *))getRealOffset(oxo("0x5435A3C"));
-
     this->GetForward = (Vector3(*)(void *))getRealOffset(oxo("0x91CAF64"));
-
     this->set_aim = (void (*)(void *, Quaternion))getRealOffset(oxo("0x53C4534"));
-
     this->get_IsSighting = (bool (*)(void *))getRealOffset(oxo("0x53B769C"));
-
-    this->get_IsFiring = (bool (*)(void *))getRealOffset(oxo("0x551C294"));
-
+    this->get_IsFiring = (bool (*)(void *))getRealOffset(oxo("0x53ACC9C"));
     this->name = (monoString * (*)(void *player)) getRealOffset(oxo("0x53BE8E0"));
 
     this->_GetHeadPositions = (void *(*)(void *))getRealOffset(oxo("0x54547E0"));
@@ -141,13 +131,14 @@ void game_sdk_t::init()
     this->_GetLeftToeTF = (void *(*)(void *))getRealOffset(oxo("0x5454FF8"));
     this->_GetRightToeTF = (void *(*)(void *))getRealOffset(oxo("0x5455104"));
     this->_getLeftHandTF = (void *(*)(void *))getRealOffset(oxo("0x53C3608"));
-    this->_getRightHandTF = (void *(*)(void *))getRealOffset(oxo("0x53C3608"));
+    this->_getRightHandTF = (void *(*)(void *))getRealOffset(oxo("0x53C370C"));
     this->_getLeftForeArmTF = (void *(*)(void *))getRealOffset(oxo("0x53C3810"));
     this->_getRightForeArmTF = (void *(*)(void *))getRealOffset(oxo("0x53C3914"));
 }
 
+
 bool IsGod(void *player){
-return *(bool *)((uint64_t) player + 0xF4C);
+return *(bool *)((uint64_t) player + 0xF94);
 }
 
 
@@ -157,7 +148,7 @@ void *get_gameObject(void *Pthis)
 }
 
 static void *GetWeaponOnHand1(void *local) {
-    void *(*_GetWeaponOnHand1)(void *local) = (void *(*)(void *))getRealOffset(0x53BE110);
+    void *(*_GetWeaponOnHand1)(void *local) = (void *(*)(void *))getRealOffset (0x53BE110);
     return _GetWeaponOnHand1(local);
 }
 
@@ -242,7 +233,7 @@ Vector3 GetHeadPosition(void *player) {
 }
 
 static Vector3 CameraMain(void *player) {
-    return game_sdk->get_position(*(void **)((uint64_t)player + oxo("0x390")));//public Transform MainCameraTransform;
+    return game_sdk->get_position(*(void **)((uint64_t)player + oxo("0x380")));//public Transform MainCameraTransform;
 }
 
 Quaternion GetRotationToTheLocation(Vector3 Target, float Height, Vector3 MyEnemy) {
@@ -269,13 +260,13 @@ public:
 
     static void *Player_GetHeadCollider(void *player)
     {
-        void *(*_Player_GetHeadCollider)(void *players) = (void *(*)(void *))getRealOffset(oxo("0x4A1A9D4"));//public virtual Collider get_HeadCollider() { }
+        void *(*_Player_GetHeadCollider)(void *players) = (void *(*)(void *))getRealOffset(oxo("0x53C2630"));//public virtual Collider get_HeadCollider() { }
         return _Player_GetHeadCollider(player);
     }
 
     static bool Physics_Raycast(Vector3 camLocation, Vector3 headLocation, unsigned int LayerID, void *collider)
     {
-        bool (*_Physics_Raycast)(Vector3 camLocation, Vector3 headLocation, unsigned int LayerID, void *collider) = (bool (*)(Vector3, Vector3, unsigned int, void *))getRealOffset(oxo("0x69B9830"));//public static bool SingleLineCheck(Vector3 startTrace, Vector3 endTrace, uint traceFlag, ref HitObjectInfo hitObjectInfo) { }
+        bool (*_Physics_Raycast)(Vector3 camLocation, Vector3 headLocation, unsigned int LayerID, void *collider) = (bool (*)(Vector3, Vector3, unsigned int, void *))getRealOffset(oxo("0x5FE855C"));//public static bool SingleLineCheck(Vector3 startTrace, Vector3 endTrace, uint traceFlag, ref HitObjectInfo hitObjectInfo) { }
         return _Physics_Raycast(camLocation, headLocation, LayerID, collider);
     }
 
@@ -412,164 +403,96 @@ void *GetClosestEnemy()
         return NULL;
     }
 }
+float AimFov = 360.0f;
 
-void *GetClosestEnemysilent()
-{
-    try
-    {
-        float shortestDistance = 99999.0f;
-        void *closestEnemy = NULL;
+void* EnemyVisible(void* match) {
+    if (!match || !Vars.Enable) return nullptr;
+    float shortestDistance = 99999.0f;
+    void* closestEnemy = nullptr;
+    void* cam = game_sdk->get_camera();
+    if (!cam) return nullptr;
+    void* LocalPlayer = game_sdk->GetLocalPlayer(match);
+    if (!LocalPlayer) return nullptr;
 
-        void *get_MatchGame = game_sdk->Curent_Match();
-        if (!get_MatchGame)
-            return NULL;
+    Dictionary<uint8_t*, void**>* players = *(Dictionary<uint8_t*, void**>**)((uintptr_t)match + 0x148);
+    if (!players || players->getValues().empty()) return nullptr;
 
-        void *LocalPlayer = game_sdk->GetLocalPlayer(get_MatchGame);
-        if (!LocalPlayer || !game_sdk->Component_GetTransform(LocalPlayer))
-            return NULL;
+        for (int u = 0; u < players->getSize(); u++)
+        {
+        void* Player = players->getValues()[u];
+        if (!Player || game_sdk->get_isLocalTeam(Player)) continue;
+        if (game_sdk->get_IsDieing(Player)) continue;
+        if (!game_sdk->get_isVisible(Player)) continue;
+        if (!game_sdk->get_MaxHP(Player)) continue;
 
-        if (!Vars.Enable)
-            return NULL;
+        Vector3 PlayerPos    = GetHeadPosition(Player);
+        Vector3 LocalPos     = GetHeadPosition(LocalPlayer);
+        void* camTF          = game_sdk->Component_GetTransform(cam);
+        Vector3 targetDir    = Vector3::Normalized(PlayerPos - LocalPos);
+        float angle          = Vector3::Angle(targetDir, game_sdk->GetForward(camTF)) * 100.0f;
 
-        Dictionary<uint8_t *, void **> *players = *(Dictionary<uint8_t *, void **> **)((long) get_MatchGame + 0x148);
-if (!players )
-return NULL;
-
-        ImVec2 screenSize = ImGui::GetIO().DisplaySize;
-
-        ImVec2 center(screenSize.x / 2, screenSize.y / 2);
-
-        for (int i = 0; i < players->getSize(); i++) {
-void *Player = players->getValues()[i];
-
-            if (!Player || Player == LocalPlayer)
-                continue;
-
-            if (!game_sdk->get_MaxHP(Player))
-                continue;
-
-            if (game_sdk->get_IsDieing(Player))
-                continue;
-
-    if (game_sdk->get_isLocalTeam(Player))
-                continue;
-
-            if (IsGod(Player))
-                continue;
-
-            int hp = game_sdk->GetHp(Player);
-            if (Vars.IgnoreKnocked && hp <= 0)
-                continue;
-
-            bool isInsideCamera = false;
-            Vector3 pos = getPosition(Player);
-            ImVec2 screenPos = Camera$$WorldToScreen::Checker(pos, isInsideCamera);
-
-            if (!isInsideCamera)
-                continue;
-
-            if (screenPos.x < 0 || screenPos.x > screenSize.x ||
-                screenPos.y < 0 || screenPos.y > screenSize.y)
-                continue;
-
-    if (CheckWall1)
-            {
-                if (!game_sdk->get_isVisible(Player))
-                    continue;
-
-                if (!tanghinh::isVisible(Player))
-                    continue;
-            }
-
-        float dx = screenPos.x - center.x;
-            float dy = screenPos.y - center.y;
-            float screenDist = sqrtf(dx * dx + dy * dy);
-
-        if (screenDist < shortestDistance)
-            {
-                shortestDistance = screenDist;
-                closestEnemy = Player;
-            }
-        }
-
-        return closestEnemy;
-    }
-catch (...)
-    {
-        return NULL;
-    }
-}
-
-int SetDamage = 1;
-
-void *getItransform(void *itransform) {
-    void * (*_itransformNode)(void *_this) = (void*(*)(void*))getRealOffset(0x66F5C04);
-    return _itransformNode(itransform);
-}
-
-static float get_Range(void *pthis)
-{
-    return ((float (*)(void *))getRealOffset(ENCRYPTOFFSET("0x6CA356C")))(pthis);
-}
-
-bool isEnemyInRangeWeapon(void *player, void *enemy, void* weapon)
-{
-    if (player != nullptr && enemy != nullptr && weapon != nullptr)
-    {
-        Vector3 EnemyHeadPosition = GetHeadPosition(enemy);
-        Vector3 PlayerHeadPosition = GetHeadPosition(player);
-        float distance = Vector3::Distance(PlayerHeadPosition, EnemyHeadPosition);
-        float range = get_Range(weapon);
-
-        if (distance <= range) {
-            return true;
+        if (angle <= AimFov && angle < shortestDistance) {
+            shortestDistance = angle;
+            closestEnemy = Player;
         }
     }
-    return false;
+    return closestEnemy;
+}
+
+void *get_HeadCollider(void *pthis) {
+    return ((void* (*)(void *))getRealOffset(0x53C2630))(pthis);
+}
+
+static float get_Range(void* pthis) {
+    return ((float(*)(void*))getRealOffset(0x5884080))(pthis);
+}
+
+bool isEnemyInRangeWeapon(void* player, void* enemy, void* weapon) {
+    if (!player || !enemy || !weapon) return false;
+    
+    
+    if (!game_sdk->Component_GetTransform(player) || !game_sdk->Component_GetTransform(enemy)) 
+        return false;
+
+    float distance = Vector3::Distance(GetHeadPosition(enemy), GetHeadPosition(player));
+    float range = get_Range(weapon);
+    
+    return distance <= range;
+}
+
+static bool Bullet_Visible_Check(Vector3 from, Vector3 to) {
+    void* hitObj = nullptr;
+    return !tanghinh::Physics_Raycast(from, to, 12, &hitObj);
 }
 
 
-Vector3 GetHipPosition(void* player) {
-    void *HipITF= *(void **)((uint64_t) player + 0x648);
-    void *HipTF = getItransform(HipITF);
-    Vector3 Hip = Transform_INTERNAL_GetPosition(HipTF);
-    return Hip;
-}
-
-int (*old_BLAGCMCGEJG1)(void *, HitObjectInfo *);
-int BLAGCMCGEJG1(void *ist, HitObjectInfo *HitObject) {
+int (*old_BLAGCMCGEJG1)(void*, HitObjectInfo*) = nullptr;
+int BLAGCMCGEJG1(void* ist, HitObjectInfo* HitObject) {
     if (SilentAim && HitObject) {
-        void *match = game_sdk->Curent_Match();
-        if (match) {
-            void *localPlayer = game_sdk->GetLocalPlayer(match);
-            if (localPlayer) {
-                void *weapon = GetWeaponOnHand1(localPlayer);
-                void *enemy = GetClosestEnemysilent();
-                if (enemy && weapon) {
-                    if (isEnemyInRangeWeapon(localPlayer, enemy, weapon)) {
-                        Vector3 enemyPos;
-                        if (SetDamage == 1)
-                            enemyPos = GetHeadPosition(enemy);
-                        else
-                            enemyPos = GetHipPosition(enemy);
-                        Vector3 startPos = GetHeadPosition(localPlayer);
-                        HitObject->HitObject = get_gameObject(tanghinh::Player_GetHeadCollider(enemy));
-                        HitObject->HitCollider = tanghinh::Player_GetHeadCollider(enemy);
-                        HitObject->HitLocation = enemyPos;
-                        HitObject->HitNormal = enemyPos;
-                        HitObject->RayDir = Vector3::Normalized(enemyPos - startPos);
-                        HitObject->StartPosition = startPos;
-                        HitObject->OrigStartPosition = startPos;
-                        HitObject->HitGroup = 1; 
+        void* current_match = game_sdk->Curent_Match();
+        if (current_match) {
+            void* local_player = game_sdk->GetLocalPlayer(current_match);
+            if (local_player) {
+                void* WeaponHand    = GetWeaponOnHand1(local_player);
+                void* ClosestEnemy  = EnemyVisible(current_match);
+                if (ClosestEnemy && isEnemyInRangeWeapon(local_player, ClosestEnemy, WeaponHand)) {
+                    Vector3 EnemyLocation  = GetHeadPosition(ClosestEnemy);
+                    Vector3 OriginalStart  = HitObject->StartPosition;
+                    if (Bullet_Visible_Check(OriginalStart, EnemyLocation)) {
+                        HitObject->HitObject     = get_gameObject(get_HeadCollider(ClosestEnemy));
+                        HitObject->HitCollider   = get_HeadCollider(ClosestEnemy);
+                        HitObject->HitLocation   = EnemyLocation;
+                        HitObject->HitNormal     = EnemyLocation;
+                        HitObject->RayDir        = Vector3::Normalized(EnemyLocation - OriginalStart);
                         HitObject->SpecialHitType = 0;
+                        HitObject->HitGroup      = 1;
                         HitObject->IgnoreHappens = false;
-                        HitObject->ViewBlocked = false;
+                        HitObject->ViewBlocked   = false;
                     }
                 }
             }
         }
     }
-
     return old_BLAGCMCGEJG1(ist, HitObject);
 }
 
