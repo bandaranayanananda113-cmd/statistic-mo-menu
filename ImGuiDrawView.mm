@@ -66,9 +66,9 @@ ImFont* pixel_smol = nullptr;
 static float fixLoginTimeout = 60.0f;
 static bool MenDeal = false;
 
-// KeyAuth Details (Please rotate your secret in KeyAuth dashboard!)
-static NSString *const kAppName = @"STATISTIC PRO";[span_0](start_span)[span_0](end_span)
-static NSString *const kOwnerID = @"wFY9t1Imun";[span_1](start_span)[span_1](end_span)
+// KeyAuth Details
+static NSString *const kAppName = @"STATISTIC PRO";
+static NSString *const kOwnerID = @"wFY9t1Imun";
 static NSString *const kAppSecret = @"b0ffff3c2299551401bdfcf35ea9be8283c0aab612cc0241c5d813e4f0f2a393";
 static NSString *const kAppVersion = @"1.0";
 
@@ -234,7 +234,7 @@ ImFont* Urbanist;
     statusMsgTimer = 5.0f;
     isAuthenticating = false;
     authFailed = true;
-    MenDeal = false; // Lock out menu gracefully instead of crashing app
+    MenDeal = false; 
 }
 
 - (void)authenticateKey:(NSString *)key {
@@ -375,13 +375,13 @@ ImFont* Urbanist;
         ImVec4 accent_hover = ImVec4(menuAccentColor[0] * 1.15f, menuAccentColor[1] * 1.15f, menuAccentColor[2] * 1.15f, 1.0f);
         ImVec4 accent_subtle = ImVec4(menuAccentColor[0], menuAccentColor[1], menuAccentColor[2], 0.20f);
 
-        // Frame Push Styles (Avoids altering global style every frame)
+        // Frame Push Styles
         ImGui::PushStyleColor(ImGuiCol_Border, accent_subtle);
         ImGui::PushStyleColor(ImGuiCol_CheckMark, accent);
         ImGui::PushStyleColor(ImGuiCol_SliderGrab, accent);
         ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, accent_hover);
 
-        // --- Status Overlay Box (Styled Pill Header) ---
+        // --- Status Overlay Box ---
         if (overlayStatusMsg.length() > 0 && statusMsgTimer > 0.0f) {
             statusMsgTimer -= io.DeltaTime;
             
@@ -397,7 +397,7 @@ ImFont* Urbanist;
         }
 
         // =========================================================
-        //  🎮 MAIN MOD MENU (REFRACTION / SHADOW / CLEAN CONTROL)
+        //  🎮 MAIN MOD MENU
         // =========================================================
         if (isLoggedIn && MenDeal)
         {                
@@ -438,7 +438,6 @@ ImFont* Urbanist;
             ImGui::Separator();
             ImGui::Spacing();
             
-            // Sidebar Buttons with Indicator Strip & Tab Smooth Animation Trigger
             auto DrawSidebarButton = [&](const char* label, int tabIndex) {
                 bool isActive = (currentTab == tabIndex);
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
@@ -457,11 +456,10 @@ ImFont* Urbanist;
                     if (currentTab != tabIndex) {
                         lastTab = currentTab;
                         currentTab = tabIndex;
-                        tabAnimAlpha = 0.0f; // Reset Alpha for Smooth Transition
+                        tabAnimAlpha = 0.0f;
                     }
                 }
                 
-                // Draw Vertical Indicator Light Bar for Active Button
                 if (isActive) {
                     ImDrawList* drawList = ImGui::GetWindowDrawList();
                     drawList->AddRectFilled(
@@ -484,9 +482,8 @@ ImFont* Urbanist;
             
             ImGui::SameLine();
             
-            // Tab Smooth Fade-In Animation Step
             if (tabAnimAlpha < 1.0f) {
-                tabAnimAlpha += io.DeltaTime * 4.0f; // Transition speed
+                tabAnimAlpha += io.DeltaTime * 4.0f;
                 if (tabAnimAlpha > 1.0f) tabAnimAlpha = 1.0f;
             }
 
@@ -494,7 +491,7 @@ ImFont* Urbanist;
             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, tabAnimAlpha);
             ImGui::BeginChild("ContentArea", ImVec2(0, 0), true);
             
-            // --- TAB 0: ESP (Using Modern BeginTable Grid API) ---
+            // --- TAB 0: ESP ---
             if (currentTab == 0) {
                 ImGui::TextColored(accent, "VISUALS & ESP");
                 ImGui::Separator();
@@ -634,12 +631,12 @@ ImFont* Urbanist;
             }
             
             ImGui::EndChild();
-            ImGui::PopStyleVar(); // Pop Alpha Animation
+            ImGui::PopStyleVar();
             
             ImGui::End();
         }
         
-        ImGui::PopStyleColor(4); // Pop scope colors
+        ImGui::PopStyleColor(4);
 
         // --- Game Drawing & Logic Calls ---
         ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
