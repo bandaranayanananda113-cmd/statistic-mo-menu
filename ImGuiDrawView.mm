@@ -66,10 +66,10 @@ ImFont* pixel_smol = nullptr;
 static float fixLoginTimeout = 60.0f;
 static bool MenDeal = false; // Menu visibility
 
-// MENU COLOR & TRANSPARENCY
-static float menuAccentColor[4] = { 0.15f, 0.55f, 1.0f, 1.0f }; // Modern Clean Blue
+// RED ACCENT COLOR
+static float menuAccentColor[3] = { 0.95f, 0.15f, 0.15f }; 
 static float menuAlpha = 0.92f;
-static int currentTab = 0; // 0: Aimbot, 1: ESP, 2: Settings
+static int currentTab = 0; // 0: Aimbot, 1: Visuals, 2: Misc, 3: Settings
 
 // STREAM PROOF CONTROL
 static bool streamProofEnabled = false;
@@ -121,36 +121,39 @@ ImFont* Urbanist;
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    // HIGH DPI SHARP FONT & CLEAN UI SETUP
+    // THEME SETUP
     ImGuiStyle& style = ImGui::GetStyle();
     style.Alpha = 1.0f;
-    style.WindowRounding = 10.0f;     
-    style.FrameRounding = 5.0f;
+    style.WindowRounding = 12.0f;     
+    style.FrameRounding = 6.0f;
     style.ChildRounding = 8.0f;
     style.PopupRounding = 8.0f;
-    style.ScrollbarRounding = 6.0f;
-    style.GrabRounding = 4.0f;
-    style.TabRounding = 5.0f;
-    style.WindowBorderSize = 0.0f;
-    style.FrameBorderSize = 0.0f;    
-    style.WindowPadding = ImVec2(14.0f, 14.0f);
-    style.ItemSpacing = ImVec2(10.0f, 10.0f);
+    style.ScrollbarRounding = 10.0f;
+    style.GrabRounding = 6.0f;
+    style.TabRounding = 6.0f;
+    style.WindowBorderSize = 1.5f;
+    style.FrameBorderSize = 1.0f;    
+    style.WindowPadding = ImVec2(12.0f, 12.0f);
+    style.ItemSpacing = ImVec2(8.0f, 8.0f);
+    style.ItemInnerSpacing = ImVec2(6.0f, 6.0f);
     style.AntiAliasedLines = true;
     style.AntiAliasedFill = true;
     
     ImVec4* colors = style.Colors;
-    colors[ImGuiCol_Text]                   = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);
-    colors[ImGuiCol_TextDisabled]           = ImVec4(0.50f, 0.55f, 0.60f, 1.00f);
-    colors[ImGuiCol_WindowBg]               = ImVec4(0.09f, 0.10f, 0.12f, menuAlpha);
-    colors[ImGuiCol_ChildBg]                = ImVec4(0.12f, 0.14f, 0.17f, 0.80f);
-    colors[ImGuiCol_PopupBg]                = ImVec4(0.09f, 0.10f, 0.12f, 0.98f);
-    colors[ImGuiCol_FrameBg]                = ImVec4(0.15f, 0.18f, 0.22f, 1.00f);
-    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.20f, 0.24f, 0.30f, 1.00f);
-    colors[ImGuiCol_TitleBg]                = ImVec4(0.07f, 0.08f, 0.10f, 1.00f);
-    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.10f, 0.12f, 0.15f, 1.00f);
-    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.05f, 0.05f, 0.06f, 0.30f);
-    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.25f, 0.30f, 0.38f, 1.00f);
-    colors[ImGuiCol_Separator]              = ImVec4(0.20f, 0.24f, 0.30f, 1.00f);
+    colors[ImGuiCol_Text]                   = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
+    colors[ImGuiCol_TextDisabled]           = ImVec4(0.50f, 0.50f, 0.55f, 1.00f);
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.06f, 0.06f, 0.08f, menuAlpha);
+    colors[ImGuiCol_ChildBg]                = ImVec4(0.08f, 0.08f, 0.10f, 0.80f);
+    colors[ImGuiCol_PopupBg]                = ImVec4(0.07f, 0.07f, 0.09f, 0.98f);
+    colors[ImGuiCol_FrameBg]                = ImVec4(0.12f, 0.12f, 0.15f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.18f, 0.18f, 0.22f, 1.00f);
+    colors[ImGuiCol_TitleBg]                = ImVec4(0.06f, 0.06f, 0.08f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
+    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.06f, 0.06f, 0.08f, 1.00f);
+    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.08f, 0.08f, 0.10f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.02f, 0.02f, 0.03f, 0.40f);
+    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.25f, 0.25f, 0.30f, 1.00f);
+    colors[ImGuiCol_Separator]              = ImVec4(0.20f, 0.20f, 0.25f, 1.00f);
 
     ImFontConfig font_cfg;
     font_cfg.SizePixels = 15.0f;
@@ -192,7 +195,7 @@ ImFont* Urbanist;
     self.mtkView.clearColor = MTLClearColorMake(0, 0, 0, 0);
     self.mtkView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
     self.mtkView.clipsToBounds = YES;
-    self.mtkView.contentScaleFactor = [UIScreen mainScreen].nativeScale;
+    self.mtkView.contentScaleFactor = [UIScreen mainScreen].scale;
     
     self.view.userInteractionEnabled = YES;
     self.view.hidden = NO;
@@ -408,34 +411,34 @@ ImFont* Urbanist;
         // =========================================================
         if (isLoggedIn && MenDeal)
         {                
-            ImGui::SetNextWindowSize(ImVec2(560, 340), ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - 560) / 2, (io.DisplaySize.y - 340) / 2), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(620, 380), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - 620) / 2, (io.DisplaySize.y - 380) / 2), ImGuiCond_FirstUseEver);
             
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
             ImGui::Begin("STATISTICS KING", &MenDeal, ImGuiWindowFlags_NoCollapse);
 
             // Left Navigation Sidebar
-            ImGui::BeginChild("Sidebar", ImVec2(140, 0), true);
+            ImGui::BeginChild("Sidebar", ImVec2(150, 0), true);
             
-            ImGui::SetCursorPosY(12);
-            ImGui::TextColored(accent, " STATISTICS");
+            ImGui::SetCursorPosY(15);
+            ImGui::TextColored(accent, " STATISTICS KING");
             ImGui::Separator();
             ImGui::Spacing();
             
             #define DRAW_TAB_BTN(name, index) \
                 if (currentTab == index) { \
                     ImGui::PushStyleColor(ImGuiCol_Button, accent); \
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1,1,1,1)); \
                 } else { \
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.18f, 0.22f, 0.6f)); \
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f,0.8f,0.8f,1)); \
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.10f, 0.12f, 0.6f)); \
                 } \
-                if (ImGui::Button(name, ImVec2(120, 34))) { currentTab = index; } \
-                ImGui::PopStyleColor(2); \
+                if (ImGui::Button(name, ImVec2(130, 36))) { currentTab = index; } \
+                ImGui::PopStyleColor(); \
                 ImGui::Spacing();
 
             DRAW_TAB_BTN("  Aimbot", 0);
-            DRAW_TAB_BTN("  Visuals (ESP)", 1);
-            DRAW_TAB_BTN("  Settings", 2);
+            DRAW_TAB_BTN("  Visuals", 1);
+            DRAW_TAB_BTN("  Misc", 2);
+            DRAW_TAB_BTN("  Settings", 3);
             
             ImGui::EndChild();
             
@@ -452,12 +455,12 @@ ImFont* Urbanist;
 
                 ImGui::Checkbox("Master Switch", &Vars.Aimbot);
                 
-                ImGui::SetNextItemWidth(200);
+                ImGui::SetNextItemWidth(220);
                 ImGui::Combo("Aimbot Config", &Vars.AimWhen, Vars.dir, 4);
                 
-                ImGui::Checkbox("Silent Aim", &SilentAim);
+                ImGui::Checkbox("Enabled", &SilentAim);
                 
-                ImGui::SetNextItemWidth(200);
+                ImGui::SetNextItemWidth(220);
                 ImGui::Combo("Aiming Method", &Vars.AimMode, Vars.aimModes, 3);
                 
                 ImGui::Checkbox("Show FOV Circle", &Vars.isAimFov);
@@ -467,16 +470,16 @@ ImFont* Urbanist;
                 ImGui::Checkbox("Ignore Knocked", &Vars.IgnoreKnocked);
                 ImGui::Checkbox("Check Wall", &CheckWall1);
                 
-                ImGui::SetNextItemWidth(200);
+                ImGui::SetNextItemWidth(220);
                 ImGui::Combo("Hitbox Target", &Vars.AimHitbox, Vars.aimHitboxes, 3);
                 
-                ImGui::SetNextItemWidth(240);
-                ImGui::SliderFloat("FOV Radius", &Vars.AimFov, 0.0f, 360.0f, "%.1f Deg");
+                ImGui::SetNextItemWidth(260);
+                ImGui::SliderFloat("FOV", &Vars.AimFov, 0.0f, 360.0f, "%.1f Deg");
             }
             
-            // --- TAB 1: VISUALS (ESP) ---
+            // --- TAB 1: VISUALS ---
             else if (currentTab == 1) {
-                ImGui::TextColored(accent, "VISUALS & ESP FUNCTIONS");
+                ImGui::TextColored(accent, "VISUALS & ESP");
                 ImGui::Separator();
                 ImGui::Spacing();
 
@@ -496,18 +499,20 @@ ImFont* Urbanist;
                 ImGui::Checkbox("Skeleton", &Vars.skeleton);
                 ImGui::Checkbox("3D Circle", &Vars.circlepos);
                 ImGui::Checkbox("Nearby Enemies Count", &Vars.enemycount);
-
-                ImGui::Spacing();
+            }
+            
+            // --- TAB 2: MISC ---
+            else if (currentTab == 2) {
+                ImGui::TextColored(accent, "MISC FUNCTIONS");
                 ImGui::Separator();
-                ImGui::TextDisabled("EXTRA VISUAL UTILITIES");
                 ImGui::Spacing();
 
                 ImGui::Checkbox("Out of Screen Warning", &Vars.OOF);
                 ImGui::Checkbox("Enemy Outline", &Vars.Outline);
             }
             
-            // --- TAB 2: SETTINGS ---
-            else if (currentTab == 2) {
+            // --- TAB 3: SETTINGS ---
+            else if (currentTab == 3) {
                 ImGui::TextColored(accent, "SYSTEM & THEME SETTINGS");
                 ImGui::Separator();
                 ImGui::Spacing();
@@ -537,7 +542,7 @@ ImFont* Urbanist;
                 ImGui::Spacing();
 
                 ImGui::SetNextItemWidth(200);
-                ImGui::ColorEdit4("Menu Accent Color", menuAccentColor, ImGuiColorEditFlags_AlphaBar);
+                ImGui::ColorEdit3("Menu Accent Color", menuAccentColor, ImGuiColorEditFlags_NoInputs);
                 
                 ImGui::SetNextItemWidth(200);
                 ImGui::SliderFloat("Menu Transparency", &menuAlpha, 0.20f, 1.00f, "%.2f");
@@ -546,7 +551,7 @@ ImFont* Urbanist;
                 ImGui::Separator();
                 ImGui::Spacing();
 
-                if (ImGui::Button("Execute Fix Login", ImVec2(150, 28))) {
+                if (ImGui::Button("Execute Fix Login", ImVec2(160, 30))) {
                     self.view.hidden = YES; 
                     MenDeal = false; 
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(fixLoginTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -555,13 +560,14 @@ ImFont* Urbanist;
                     });
                 }
                 ImGui::SameLine();
-                ImGui::SetNextItemWidth(130);
+                ImGui::SetNextItemWidth(140);
                 ImGui::SliderFloat("##fixlogin", &fixLoginTimeout, 40.0f, 80.0f, "Timeout: %.0f s");
             }
             
             ImGui::EndChild();
             
             ImGui::End();
+            ImGui::PopStyleVar();
         }
         
         // --- Game Logic Render ---
